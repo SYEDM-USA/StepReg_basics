@@ -1,0 +1,85 @@
+---
+title: "HW3"
+author: "Bradley Haren"
+date: "10/21/2021"
+output: html_document
+---
+
+## 1. Fit a multiple linear regression model by regressing y to the rest of the regressors. Write the equation of the fitted regression line.
+
+```{r}
+df = read.csv("./chemical.csv", header=T)
+df = df[-c(3)]
+mlr = lm(y ~ ., data=df)
+summary(mlr)
+```
+
+Equation of fitted regression line:
+y_hat = 2.187889 - 0.065137(x1) + 0.140757(x3) -0.211376(x4) - 0.002712(x5) + 0.017304(x6) + 2.005804(x7)
+
+## 2. Test for significance of regression. Write the null hypothesis, alternate hypothesis, test statistic, p-value and conclusion.
+
+- H0: β1=β2=···=βk=0 
+
+- H1: βj !=0 for at least one j.
+
+- Test-statistic: 8.325
+
+- p-value: 0.0001321
+
+- Since p < 0.05, we reject the null hypothesis. There is enough evidence to conclude that at least one of the regression coefficients is non-zero.
+
+## 3. Test for individual regression coefficients and list your findings.
+
+- First lets test the regression coefficient accociated to x1 to see if it is significant. H0: β1=0 vs H1: β1 !=0. We see that the value of the test-statistic is -0.238 with p-value 0.8145. Since the p-value > 0.05 we fail to reject the H0. The relationship between y and x1 is not significant. 
+
+- Next lets test the regression coefficient accociated to x3 to see if it is significant. H0: β2=0 vs H1: β2 !=0. We see that the value of the test-statistic is 0.438 with p-value 0.6660. Since the p-value > 0.05 we fail to reject the H0. The relationship between y and x3 is not significant.
+
+- Next lets test the regression coefficient accociated to x4 to see if it is significant. H0: β3=0 vs H1: β3 !=0. We see that the value of the test-statistic is -0.770 with p-value 0.4505. Since the p-value > 0.05 we fail to reject the H0. The relationship between y and x4 is not significant.
+
+- Next lets test the regression coefficient accociated to x5 to see if it is significant. H0: β4=0 vs H1: β4 !=0. We see that the value of the test-statistic is -0.282 with p-value 0.7808. Since the p-value > 0.05 we fail to reject the H0. The relationship between y and x5 is not significant.
+
+- Next lets test the regression coefficient accociated to x6 to see if it is significant. H0: β5=0 vs H1: β5 !=0. We see that the value of the test-statistic is 2.263 with p-value 0.0349. Since the p-value < 0.05 we reject the H0. The relationship between y and x6 is significant.
+
+- Lastly, lets test the regression coefficient accociated to x7 to see if it is significant. H0: β6=0 vs H1: β6 !=0. We see that the value of the test-statistic is 1.842 with p-value 0.0803. Since the p-value > 0.05 we fail reject the H0, the relationship between y and x7 is not significant, if the significant level is 0.05. If we go off of a significants level of 0.1 then x7 will reject the H0 and be significant. 
+
+## 4. Does the model suffer from potential multicollinearity?
+
+```{r}
+library(car)
+vif(mlr)
+```
+
+There does seem to be some multicollinearity. x4, x5, and x6 here all have values greater than 4, so we may need to keep them in mind.
+
+## 5. Take some appropriate measure to get rid of multicollinearity. Write the equation of the fitted regression line of the resultant model.
+
+```{r}
+cor(df)
+```
+- Since x6 is highly correlated with x1 and x5 we will remove the rest and see how it affects the VIF. 
+
+```{r}
+mlr2 <- lm(y ~ x1+x5+x6, data=df)
+vif(mlr2)
+```
+- This still suffers from multicollinearity so we will remove x5. 
+
+```{r}
+mlr3 <- lm(y~ x1+x6, data=df)
+vif(mlr3)
+```
+- This model no longer suffers from multicollinearity. 
+
+## 6. Use a stepwise like approach for variable selection. Write the equation of the fitted regression line of the resultant model.
+
+```{r}
+library(StepReg)
+stepwise(df, y="y", selection = "forward", select = "adjRsq")
+mlr2 = lm(y ~ x6 + x7, data=df)
+summary(mlr2)
+```
+
+Based on stepwise selection, we add x6 and x7 to the model only. The fitted regression line is:
+
+y_hat = 2.526460 + 0.018522(x6) + 2.185753(x7)

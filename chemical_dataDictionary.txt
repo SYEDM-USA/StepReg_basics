@@ -1,0 +1,25 @@
+This data frame contains the following columns:
+
+y
+CO2
+
+x1
+Space time (in min)
+
+x2
+Temperature (in degrees Celsius)
+
+x3
+Percent solvation
+
+x4
+Oil yield (g/100g MAF)
+
+x5
+Coal total
+
+x6
+Solvent total
+
+x7
+Hydrogen consumption
